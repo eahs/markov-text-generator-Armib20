@@ -46,6 +46,19 @@ namespace MarkovTextGenerator
             // TODO: Add each word pair to the chain
             // TODO: The last word of any sentence will be paired up with
             //       an empty string to show that it is the end of the sentence
+
+            string[] split = sentence.Split(' ');
+            for (int i = 0; i < split.Length - 1; i++)
+            {
+                if (i == split.Length - 2)
+                {
+                    AddPair(split[i], " ");
+                }
+                else
+                {
+                    AddPair(split[i], split[i + 1]);
+                }
+            }
         }
 
         // Adds a pair of words to the chain that will appear in order
@@ -93,11 +106,19 @@ namespace MarkovTextGenerator
             {
                 List<Word> choices = words[word];
                 double test = rand.NextDouble();
-
-                Console.WriteLine("I picked the number " + test); 
+                double nextChance = 0;
+                
+                foreach (Word choice in choices)
+                {
+                    nextChance += choice.Probability;
+                    if (nextChance > test)
+                    {
+                        return choice.ToString();
+                    }
+                }
             }
-
-            return "idkbbq";
+            
+            return "Ali Rizwan";
         }
 
         /// <summary>
@@ -108,7 +129,34 @@ namespace MarkovTextGenerator
         /// <returns></returns>
         public String GenerateSentence(string startingWord)
         {
-            return "";
+            /*string word = startingWord;
+            string sentence = startingWord;
+            
+            Console.WriteLine(":"+ GetNextWord(word));
+            word += " "+ GetNextWord(word);
+            
+            string[] parts = word.Split(' ');
+            string lastWord = parts[parts.Length - 1];
+            
+         
+
+            
+            while (word[word.Length - 1] != ' ')
+            {
+                sentence += " " + lastWord;
+                word += GetNextWord(word);
+            }
+
+            return sentence;*/
+            string word = startingWord;
+            string sentence = " ";
+            while (word != " ")
+            {
+                sentence += " " + word;
+                word = GetNextWord(word);
+            }
+
+            return sentence;
         }
         
         /// <summary>
