@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace MarkovTextGenerator
     {
         public Dictionary<String, List<Word>> words;
         private Dictionary<String, int> sums;
+        private List<String> startingWords;
         private Random rand;
 
         public Chain ()
@@ -17,6 +19,7 @@ namespace MarkovTextGenerator
             words = new Dictionary<String, List<Word>>();
             sums = new Dictionary<string, int>();
             rand = new Random(System.Environment.TickCount);
+            startingWords = new List<string>();
         }
 
         /// <summary>
@@ -27,7 +30,7 @@ namespace MarkovTextGenerator
         /// <returns></returns>
         public String GetRandomStartingWord ()
         {
-            return words.Keys.ElementAt(rand.Next() % words.Keys.Count);
+            return startingWords.ElementAt(rand.Next() % startingWords.Count);
         }
 
         // Adds a sentence to the chain
@@ -45,27 +48,25 @@ namespace MarkovTextGenerator
             // TODO: Break sentence up into word pairs
             // TODO: Add each word pair to the chain
             // TODO: The last word of any sentence will be paired up with
-            //       an empty string to show that it is the end of the sentence
+            //       an empty, string to show that it is the end of the sentence
+            if (String.IsNullOrEmpty(sentence))
+            {
+                return;
+            }
 
-            sentence = sentence.Replace(",", "");
-            sentence = sentence.Replace(".", "");
-            sentence = sentence.Replace("!", "");
+            sentence = sentence.Replace("\\", "");
             sentence = sentence.ToLower();
             
-            string[] split = sentence.Split(' ');
+            string[] split = sentence.Split(' ', '!', '.', '?').Where(s => s.Length > 0).ToArray();
             
-            for (int i = 0; i < split.Length - 1; i++)
+            startingWords.Add(split[0]);
+            
+            for (int i = 0; i < split.Length - 2; i++)
             {
-                if (i == split.Length - 2)
-                {
-                    AddPair(split[i], " ");
-                }
-                else
-                {
-                    AddPair(split[i], split[i + 1]);
-                    //Console.WriteLine(split[i] + " " + split[i + 1]);
-                }
+                AddPair(split[i], split[i + 1]);
+                
             }
+            AddPair(split[split.Length-1], "");
         }
 
         // Adds a pair of words to the chain that will appear in order
@@ -112,7 +113,7 @@ namespace MarkovTextGenerator
             if (words.ContainsKey(word))
             {
                 List<Word> choices = words[word];
-                choices = choices.OrderBy(c => c.Probability).ToList();
+                choices = choices.OrderBy(c => c.Probability * 5).ToList();
                 double test = rand.NextDouble();
                 double nextChance = 0;
                 
@@ -125,8 +126,8 @@ namespace MarkovTextGenerator
                         return choice.ToString();
                     }
                 }
+                
             }
-            
             return "Ali Rizwan";
         }
 
@@ -158,7 +159,7 @@ namespace MarkovTextGenerator
             string sentence = startingWord;
             word = GetNextWord(startingWord);
             
-            while (word != " ")
+            while (word != "")
             {
                 sentence += " " + word;
                 word = GetNextWord(word);

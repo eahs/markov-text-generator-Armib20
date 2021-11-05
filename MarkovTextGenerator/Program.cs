@@ -42,7 +42,13 @@ namespace MarkovTextGenerator
             String word = Console.ReadLine();
             String nextWord = chain.GetNextWord(word);
             Console.WriteLine("I predict the next word will be " + nextWord);
+            
+            word = chain.GetRandomStartingWord();
             Console.WriteLine(chain.GenerateSentence(word));
+            
+            
+            
+            
         }
 
         static void LoadText(string filename, Chain chain)
