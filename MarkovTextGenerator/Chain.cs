@@ -112,13 +112,13 @@ namespace MarkovTextGenerator
             if (words.ContainsKey(word))
             {
                 List<Word> choices = words[word];
-                choices = choices.OrderBy(c => (c.Probability * 10)).ToList();
+                choices = choices.OrderBy(c => c.Probability).ToList();
                 double test = rand.NextDouble();
                 double nextChance = 0;
                 
                 foreach (Word choice in choices)
                 { 
-                    nextChance += choice.Probability;
+                    nextChance += (choice.Probability * 10);
                     if (nextChance > test)
                     {
                         //Console.WriteLine(choice + " " + choice.Probability);
