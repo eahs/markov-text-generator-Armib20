@@ -47,7 +47,13 @@ namespace MarkovTextGenerator
             // TODO: The last word of any sentence will be paired up with
             //       an empty string to show that it is the end of the sentence
 
+            sentence = sentence.Replace(",", "");
+            sentence = sentence.Replace(".", "");
+            sentence = sentence.Replace("!", "");
+            sentence = sentence.ToLower();
+            
             string[] split = sentence.Split(' ');
+            
             for (int i = 0; i < split.Length - 1; i++)
             {
                 if (i == split.Length - 2)
@@ -57,6 +63,7 @@ namespace MarkovTextGenerator
                 else
                 {
                     AddPair(split[i], split[i + 1]);
+                    //Console.WriteLine(split[i] + " " + split[i + 1]);
                 }
             }
         }
@@ -105,14 +112,16 @@ namespace MarkovTextGenerator
             if (words.ContainsKey(word))
             {
                 List<Word> choices = words[word];
+                choices = choices.OrderBy(c => (c.Probability * 10)).ToList();
                 double test = rand.NextDouble();
                 double nextChance = 0;
                 
                 foreach (Word choice in choices)
-                {
+                { 
                     nextChance += choice.Probability;
                     if (nextChance > test)
                     {
+                        //Console.WriteLine(choice + " " + choice.Probability);
                         return choice.ToString();
                     }
                 }
@@ -138,18 +147,17 @@ namespace MarkovTextGenerator
             string[] parts = word.Split(' ');
             string lastWord = parts[parts.Length - 1];
             
-         
-
-            
             while (word[word.Length - 1] != ' ')
             {
                 sentence += " " + lastWord;
                 word += GetNextWord(word);
             }
-
             return sentence;*/
+            
             string word = startingWord;
-            string sentence = " ";
+            string sentence = startingWord;
+            word = GetNextWord(startingWord);
+            
             while (word != " ")
             {
                 sentence += " " + word;
